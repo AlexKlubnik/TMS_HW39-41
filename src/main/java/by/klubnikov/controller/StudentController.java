@@ -7,9 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping
@@ -68,8 +67,8 @@ public class StudentController {
                                 Errors errors) {
 
             if (errors.hasErrors()) {
-                FieldError nameError = errors.getFieldError("name");
-                FieldError addressError = errors.getFieldError("address");
+                String nameError = errors.getFieldError("name").getDefaultMessage();
+                String addressError = Objects.requireNonNull(errors.getFieldError("address")).getDefaultMessage();
                 model.addAttribute("nameError", nameError);
                 model.addAttribute("addressError", addressError);
                 return "studentform.jsp";
