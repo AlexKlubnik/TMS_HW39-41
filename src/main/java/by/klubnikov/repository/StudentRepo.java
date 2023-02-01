@@ -15,17 +15,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StudentRepo implements CrudRepository<Student, Integer> {
 
-    private final String GET_ALL_STUDENTS_FROM_DB = "select * from students";
-    private final String GET_STUDENT_BY_ID = "select id, name, address from students where id = ?";
-    private final String SAVE_STUDENT = "insert into students (name, address) values (?,?) ";
-    private final String UPDATE_STUDENT = "update students set name = ?, address = ? where id = ?";
-    private final String DELETE_STUDENT = "delete from students where id = ?";
+    private final String GET_ALL_STUDENTS_FROM_DB_SQL = "select * from students";
+    private final String GET_STUDENT_BY_ID_SQL = "select id, name, address from students where id = ?";
+    private final String SAVE_STUDENT_SQL = "insert into students (name, address) values (?,?) ";
+    private final String UPDATE_STUDENT_SQL = "update students set name = ?, address = ? where id = ?";
+    private final String DELETE_STUDENT_SQL = "delete from students where id = ?";
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public List<Student> findAll() {
-        return jdbcTemplate.query(GET_ALL_STUDENTS_FROM_DB,
+        return jdbcTemplate.query(GET_ALL_STUDENTS_FROM_DB_SQL,
                 ((rs, rowNum) -> new Student(rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("address"))));
@@ -34,7 +34,7 @@ public class StudentRepo implements CrudRepository<Student, Integer> {
     @Override
     public Optional<Student> findById(Integer id) {
 
-        Student student = jdbcTemplate.queryForObject(GET_STUDENT_BY_ID,
+        Student student = jdbcTemplate.queryForObject(GET_STUDENT_BY_ID_SQL,
                 (rs, rowNum) ->
                         new Student(rs.getInt("id"),
                                 rs.getString("name"),
@@ -44,28 +44,30 @@ public class StudentRepo implements CrudRepository<Student, Integer> {
     }
 
     @Override
-    public Integer save(Student entity) {
+    public Student save(Student student) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(SAVE_STUDENT, new String[]{"id"});
-            ps.setString(1, entity.getName());
-            ps.setString(2, entity.getAddress());
+            PreparedStatement ps = connection.prepareStatement(SAVE_STUDENT_SQL, new String[]{"id"});
+            ps.setString(1, student.getName());
+            ps.setString(2, student.getAddress());
             return ps;
         }, keyHolder);
-        return keyHolder.getKey().intValue();
+        int id = keyHolder.getKey().intValue();
+        student.setId(id);
+        return student;
     }
 
     @Override
-    public void update(Student entity) {
-        jdbcTemplate.update(UPDATE_STUDENT,
-                entity.getName(),
-                entity.getAddress(),
-                entity.getId());
+    public void update(Student student) {
+        jdbcTemplate.update(UPDATE_STUDENT_SQL,
+                student.getName(),
+                student.getAddress(),
+                student.getId());
     }
 
     @Override
-    public void delete(Student entity) {
-        jdbcTemplate.update(DELETE_STUDENT, entity.getId());
+    public void delete(Integer id) {
+        jdbcTemplate.update(DELETE_STUDENT_SQL, id);
     }
 }

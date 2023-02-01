@@ -1,42 +1,41 @@
 package by.klubnikov.service;
 
 import by.klubnikov.model.Student;
-import by.klubnikov.repository.CrudRepository;
+import by.klubnikov.repository.StudentRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class StudentService implements CrudRepository<Student, Integer> {
+public class StudentService {
 
-    private final CrudRepository<Student, Integer> repository;
+    private final StudentRepo repository;
 
-    @Override
+
     public List<Student> findAll() {
         return repository.findAll();
     }
 
-    @Override
-    public Optional<Student> findById(Integer id) {
-        return repository.findById(id);
+
+    public Student findById(Integer id) {
+        return repository.findById(id).orElseThrow();
     }
 
-    @Override
-    public Integer save(Student entity) {
-        repository.save(entity);
-        return entity.getId();
+
+    public Student save(Student student) {
+        repository.save(student);
+        return student;
     }
 
-    @Override
-    public void update(Student entity) {
-        repository.update(entity);
+
+    public void update(Student student) {
+        repository.update(student);
     }
 
-    @Override
-    public void delete(Student entity) {
-        repository.delete(entity);
+
+    public void delete(Integer id) {
+        repository.delete(id);
     }
 }

@@ -5,7 +5,6 @@ import by.klubnikov.interceptor.StudentsInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -21,7 +20,7 @@ import javax.sql.DataSource;
 public class Config implements WebMvcConfigurer {
 
     private final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    private final String URL = "jdbc:mysql://localhost:3306/test_db";
+    private final String URL = "jdbc:mysql://localhost:3306/homework_db";
     private final String USERNAME = "root";
     private final String PASSWORD = "123root";
 

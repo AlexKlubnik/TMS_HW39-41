@@ -5,28 +5,27 @@ import by.klubnikov.service.StudentService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
 @Controller
-@RequestMapping
+@RequestMapping("students")
 @RequiredArgsConstructor
+@Slf4j
 public class StudentController {
 
     private final StudentService studentService;
     private int visitCounter;
 
-    @GetMapping("students")
-    public String getAllStudents(HttpSession session, Model model) {
+    @GetMapping()
+    public String findAll(HttpSession session, Model model) {
         visitCounter++;
         LocalDateTime timeOfGetAllStudents = LocalDateTime.now();
         List<Student> students = studentService.findAll();
@@ -39,43 +38,40 @@ public class StudentController {
         return "students.jsp";
     }
 
-    @GetMapping("student")
-    public String getStudentById(HttpSession session,
-                                 @RequestParam(value = "method") String method,
-                                 @RequestParam(value = "id") int id) {
-        if ("getById".equals(method)) {
-            Student student = studentService.findById(id).orElseThrow();
+    @GetMapping("/{id}")
+    public String findById(HttpSession session,
+                                 @PathVariable(value = "id") Integer id) {
+            Student student = studentService.findById(id);
             int studentId = student.getId();
             String studentName = student.getName();
             String studentAddress = student.getAddress();
             session.setAttribute("id", studentId);
             session.setAttribute("name", studentName);
             session.setAttribute("address", studentAddress);
-        } else return "error.jsp";
 
         return "student.jsp";
     }
 
-    @GetMapping("studentform")
+    @GetMapping("/studentform")
     public String showForm() {
-        return "studentform.jsp";
+        return "student_form.jsp";
     }
 
-    @PostMapping("studentform")
-    public String createStudent(Model model,
-                                @Valid Student student,
-                                Errors errors) {
+    @PostMapping("/studentform")
+    public String save(Model model,
+                       @Valid Student student,
+                       Errors errors) {
 
             if (errors.hasErrors()) {
-                String nameError = errors.getFieldError("name").getDefaultMessage();
+                String nameError = Objects.requireNonNull(errors.getFieldError("name")).getDefaultMessage();
                 String addressError = Objects.requireNonNull(errors.getFieldError("address")).getDefaultMessage();
                 model.addAttribute("nameError", nameError);
                 model.addAttribute("addressError", addressError);
-                return "studentform.jsp";
+                return "student_form.jsp";
             }
 
         studentService.save(student);
-        return "students.jsp";
+        return "redirect:/students";
     }
 
 }

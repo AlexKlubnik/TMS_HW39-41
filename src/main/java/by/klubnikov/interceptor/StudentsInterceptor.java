@@ -17,4 +17,5 @@ public class StudentsInterceptor implements HandlerInterceptor {
         log.info("GetAllStudents method was called at {}", dateTime);
         log.info("We have got {} students", studentsQuant);
     }
+
 }
